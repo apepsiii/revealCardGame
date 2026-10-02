@@ -1,0 +1,22 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+revealCard
+
+# SQLite databases
+data/*.db
+data/*.db-journal
+data/*.db-wal
+
+# Temporary / testing
+cookies.txt
+.env
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,111 @@
+/* Card Reveal Challenge - Custom 3D Flip & Ace Styles */
+
+/* 3D Perspective Container */
+.perspective-1000 {
+  perspective: 1200px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Transisi Halus Pembalikan Kartu */
+.card-flip-inner {
+  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.card-flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Pola Kartu Remi Geometris Minimalis di Bagian Belakang Kartu */
+.pattern-card-back {
+  background-color: #3b82f6;
+  background-image:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.15) 20%,
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(255, 255, 255, 0.1) 25%,
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(255, 255, 255, 0.1) 25%,
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(255, 255, 255, 0.1) 25%,
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(255, 255, 255, 0.1) 25%,
+      transparent 25%
+    );
+  background-size:
+    24px 24px,
+    24px 24px,
+    24px 24px,
+    24px 24px,
+    24px 24px;
+}
+
+/* Efek Hover Angkat Kartu */
+.card-hover-effect {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.card-hover-effect:not(.disabled):hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 10px 10px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* Pulse Glow untuk Kartu Terpilih */
+@keyframes goldPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 16px rgba(234, 179, 8, 0);
+  }
+}
+
+.pulse-glow {
+  animation: goldPulse 2s infinite;
+}
+
+/* Animasi Masuk Modal Tantangan */
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-pop-in {
+  animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

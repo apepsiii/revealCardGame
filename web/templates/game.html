@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet">
+    <!-- Custom 3D CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-amber-50/60 via-slate-50 to-blue-50/50 min-h-screen text-slate-800 antialiased selection:bg-rose-500 selection:text-white">
+
+    <!-- Header Bar -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-slate-200/80 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+
+        <!-- Brand & Title -->
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 via-rose-600 to-amber-500 flex items-center justify-center shadow-md shadow-rose-500/20 text-white font-black text-xl">
+            ♠
+          </div>
+          <div>
+            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+              Card Reveal <span class="text-rose-600">Challenge</span>
+            </h1>
+            <p class="text-xs text-slate-500 font-medium hidden sm:block">
+              Spesial Lengseran OSIS SMK NIBA • Buka kartu & salaman dengan temanmu!
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button id="resetSessionBtn"
+            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold bg-amber-100/80 text-amber-900 hover:bg-amber-200/80 transition-all border border-amber-300/60 shadow-sm active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span class="hidden sm:inline">Reset Sesi</span>
+          </button>
+
+          <a href="/admin"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-md shadow-slate-900/10 active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="hidden sm:inline">Admin Panel</span>
+          </a>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Game Board Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+
+      <!-- Top Announcement Banner -->
+      <div class="mb-8 text-center max-w-2xl mx-auto">
+        <span
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700 tracking-wider mb-2.5 shadow-xs">
+          🤝 Lengseran OSIS SMK NIBA • Momen Kebersamaan
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Pilih Kartu & Temukan Temanmu!
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600 mt-1">
+          Buka kartu pilihanmu, baca sifatnya dengan lantang, lalu salaman dengan teman yang paling cocok!
+        </p>
+      </div>
+
+      <!-- Cards Grid (20-30 Cards) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+        {{ range .Cards }}
+        <div class="card-item cursor-pointer perspective-1000 select-none group" data-id="{{ .ID }}"
+          data-number="{{ .CardNumber }}" data-suit="{{ .Suit }}" data-symbol="{{ .SuitSymbol }}"
+          data-color="{{ .SuitColorClass }}" data-challenge="{{ .ChallengeText }}"
+          data-revealed="{{ if .IsRevealed }}true{{ else }}false{{ end }}">
+          <!-- 3D Flip Container -->
+          <div
+            class="card-flip-inner relative w-full aspect-[2/3] rounded-2xl shadow-md card-hover-effect preserve-3d {{ if .IsRevealed }}is-flipped{{ end }}">
+
+            <!-- SISI DEPAN (Tertutup / Cover Kartu AS Bermotif Mewah & Ceria) -->
+            <div
+              class="card-front absolute inset-0 w-full h-full rounded-2xl pattern-card-back border-4 border-white/90 shadow-lg flex flex-col justify-between p-3.5 backface-hidden text-white overflow-hidden">
+              <!-- Ornamen Sudut Kiri Atas -->
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col items-center leading-none">
+                  <span class="text-sm font-black tracking-tight text-white drop-shadow">{{ .CardNumber }}</span>
+                  <span class="text-xs text-amber-300">★</span>
+                </div>
+                <div
+                  class="w-5 h-5 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-[10px] font-bold text-white">
+                  #
+                </div>
+              </div>
+
+              <!-- Pusat Kartu AS -->
+              <div class="flex-1 flex flex-col items-center justify-center">
+                <div
+                  class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                  <span class="text-3xl sm:text-4xl font-black drop-shadow text-amber-300">
+                    {{ .SuitSymbol }}
+                  </span>
+                </div>
+                <div
+                  class="mt-2 text-xs font-bold tracking-widest uppercase text-white/90 bg-black/20 px-2.5 py-0.5 rounded-full">
+                  KARTU {{ .CardNumber }}
+                </div>
+              </div>
+
+              <!-- Ornamen Sudut Kanan Bawah -->
+              <div class="flex items-center justify-between rotate-180">
+                <div class="flex flex-col items-center leading-none">
+                  <span class="text-sm font-black tracking-tight text-white drop-shadow">{{ .CardNumber }}</span>
+                  <span class="text-xs text-amber-300">★</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SISI BELAKANG (Terbuka / Menampilkan Tantangan) -->
+            <div
+              class="card-back absolute inset-0 w-full h-full rounded-2xl bg-white border-4 {{ .SuitBorderClass }} shadow-lg p-3.5 flex flex-col justify-between backface-hidden rotate-y-180 text-slate-800">
+              <!-- Sudut Kiri Atas Kartu Terbuka -->
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col items-center leading-none">
+                  <span class="text-sm font-black {{ .SuitColorClass }}">{{ .CardNumber }}</span>
+                  <span class="text-xs {{ .SuitColorClass }}">{{ .SuitSymbol }}</span>
+                </div>
+                <!-- Badge Terbuka -->
+                <span
+                  class="revealed-tag {{ if not .IsRevealed }}hidden{{ end }} px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-extrabold flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clip-rule="evenodd" />
+                  </svg>
+                  SELESAI
+                </span>
+              </div>
+
+              <!-- Isi Singkat Tantangan -->
+              <div class="flex-1 flex flex-col items-center justify-center text-center px-1">
+                <span class="text-2xl font-black mb-1 {{ .SuitColorClass }}">{{ .SuitSymbol }}</span>
+                <p class="text-xs sm:text-sm font-bold text-slate-700 line-clamp-4 leading-snug">
+                  {{ .ChallengeText }}
+                </p>
+              </div>
+
+              <!-- Bagian Bawah -->
+              <div class="text-center">
+                <span class="text-[10px] font-semibold text-slate-400 group-hover:text-slate-600 transition-colors">
+                  Klik untuk perbesar 🔍
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        {{ else }}
+        <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-dashed border-slate-300">
+          <span class="text-5xl mb-3 block">📭</span>
+          <h3 class="text-lg font-bold text-slate-800">Belum Ada Kartu yang Ditambahkan</h3>
+          <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">
+            Silakan buka panel admin untuk menambahkan kartu atau lakukan seeding kartu otomatis.
+          </p>
+          <a href="/admin"
+            class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold bg-rose-600 text-white hover:bg-rose-700 shadow-md">
+            Buka Admin Panel
+          </a>
+        </div>
+        {{ end }}
+      </div>
+
+    </main>
+
+    <!-- Modal Tantangan Fullscreen / Fokus Kelas -->
+    <div id="challengeModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 bg-slate-900/70 backdrop-blur-md transition-opacity">
+      <div
+        class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border-4 border-amber-300 p-6 sm:p-10 animate-pop-in text-center overflow-hidden">
+
+        <!-- Latar Belakang Dekoratif -->
+        <div class="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-amber-100/60 blur-2xl pointer-events-none">
+        </div>
+        <div class="absolute -bottom-16 -left-16 w-44 h-44 rounded-full bg-rose-100/60 blur-2xl pointer-events-none">
+        </div>
+
+        <!-- Tombol Tutup -->
+        <button id="closeModalBtn"
+          class="absolute top-5 right-5 w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-lg font-bold transition-colors">
+          ✕
+        </button>
+
+        <!-- Label Kartu -->
+        <div
+          class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm font-extrabold tracking-wider uppercase mb-4">
+          🎯 TANTANGAN KELAS
+        </div>
+
+        <!-- Nomor & Simbol Kartu -->
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <span id="modalCardSuit" class="text-5xl font-black text-rose-600">♠</span>
+          <h3 id="modalCardNumber" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            KARTU #1
+          </h3>
+        </div>
+
+        <!-- Teks Tantangan yang Besar & Jelas untuk Proyektor -->
+        <div class="my-6 sm:my-8 px-4 py-6 sm:py-8 bg-amber-50/50 rounded-2xl border-2 border-dashed border-amber-200">
+          <p id="modalChallengeText" class="text-xl sm:text-3xl font-extrabold text-slate-800 leading-relaxed">
+            Tantangan sedang dimuat...
+          </p>
+        </div>
+
+        <!-- Instruksi Bawah -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button onclick="document.getElementById('closeModalBtn').click()"
+            class="w-full sm:w-auto px-8 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-black text-base shadow-lg shadow-rose-500/25 active:scale-95 transition-all">
+            Selesai & Lanjutkan Permainan 🎉
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Canvas Partikel Confetti -->
+    <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <!-- Script Interaksi -->
+    <script src="/static/js/game.js"></script>
+  </body>
+
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="id">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-50 text-slate-800 min-h-screen antialiased">
+
+    <!-- Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <a href="/"
+            class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-sm">
+            ♠
+          </a>
+          <div>
+            <h1 class="text-xl font-black text-slate-900 flex items-center gap-2">
+              Panel Guru <span class="text-rose-600">/ Admin</span>
+            </h1>
+            <p class="text-xs text-slate-500 font-medium">Kelola seluruh kalimat tantangan kartu siswa</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="/"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors border border-rose-200 shadow-xs">
+            <span>🎮 Buka Game Board</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <!-- Flash Message Alert -->
+      <div id="flashAlert"
+        class="hidden mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center justify-between">
+        <span id="flashText">Aksi berhasil dilakukan.</span>
+        <button onclick="this.parentElement.classList.add('hidden')"
+          class="text-emerald-600 hover:text-emerald-900 font-bold">✕</button>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Kartu</p>
+            <h3 class="text-3xl font-black text-slate-900 mt-1">{{ .TotalCards }}</h3>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl font-black">
+            🎴
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kartu Aktif</p>
+            <h3 class="text-3xl font-black text-emerald-600 mt-1">{{ .ActiveCards }}</h3>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-black">
+            ✓
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Terbuka di Sesi</p>
+            <h3 class="text-3xl font-black text-amber-600 mt-1">{{ .RevealedCards }}</h3>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-black">
+            🔓
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div
+        class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">Daftar Kartu Tantangan</h2>
+          <p class="text-xs text-slate-500">Sesuaikan kalimat tantangan agar cocok dengan materi atau topik kelas hari
+            ini.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="openCreateModal()"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm bg-rose-600 text-white hover:bg-rose-700 shadow-md shadow-rose-600/20 active:scale-95 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+            </svg>
+            Tambah Kartu
+          </button>
+
+          <button onclick="openBatchModal()"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/20 active:scale-95 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Batch Import (Banyak)
+          </button>
+
+          <!-- Tombol Bulk Delete Terpilih -->
+          <button id="bulkDeleteBtn" onclick="submitBulkDelete()" disabled
+            class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold text-sm bg-rose-100 text-rose-300 transition-all border border-rose-200 cursor-not-allowed">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span>Hapus Terpilih (<span id="selectedCount">0</span>)</span>
+          </button>
+
+          <form action="/admin/cards/delete-all" method="POST"
+            onsubmit="return confirm('⚠️ PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA KARTU di database? Tindakan ini tidak dapat dibatalkan!')">
+            <button type="submit"
+              class="inline-flex items-center gap-2 px-3 py-2.5 rounded-xl font-bold text-xs bg-slate-100 text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors border border-slate-200" title="Kosongkan seluruh kartu">
+              Hapus Semua
+            </button>
+          </form>
+
+          <form action="/admin/cards/bulk-seed" method="POST"
+            onsubmit="return confirm('Kembalikan semua kartu ke daftar 25 tantangan default? Perubahan kustom akan ditimpa.')">
+            <button type="submit"
+              class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-bold text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Reset ke 25 Default
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Hidden Form untuk Bulk Delete -->
+      <form id="bulkDeleteForm" action="/admin/cards/bulk-delete" method="POST" class="hidden">
+        <input type="hidden" name="card_ids_csv" id="bulkDeleteIds" value="">
+      </form>
+
+      <!-- Cards Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead
+              class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <tr>
+                <th scope="col" class="px-4 py-4 w-10 text-center">
+                  <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" title="Pilih Semua"
+                    class="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 cursor-pointer">
+                </th>
+                <th scope="col" class="px-4 py-4">Nomor</th>
+                <th scope="col" class="px-6 py-4">Motif / Simbol</th>
+                <th scope="col" class="px-6 py-4">Isi Kalimat Tantangan</th>
+                <th scope="col" class="px-6 py-4">Status Sesi</th>
+                <th scope="col" class="px-6 py-4">Visibilitas</th>
+                <th scope="col" class="px-6 py-4 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              {{ range .Cards }}
+              <tr class="hover:bg-slate-50/80 transition-colors">
+                <td class="px-4 py-4 text-center">
+                  <input type="checkbox" name="card_ids" value="{{ .ID }}" onchange="updateSelection()"
+                    class="card-checkbox w-4 h-4 rounded text-rose-600 focus:ring-rose-500 cursor-pointer">
+                </td>
+                <td class="px-4 py-4 font-black text-slate-900">
+                  #{{ .CardNumber }}
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-slate-100 {{ .SuitColorClass }}">
+                    <span class="text-base leading-none">{{ .SuitSymbol }}</span>
+                    <span class="capitalize">{{ .Suit }}</span>
+                  </span>
+                </td>
+                <td class="px-6 py-4 max-w-md">
+                  <p class="font-medium text-slate-800 line-clamp-2 leading-relaxed">
+                    {{ .ChallengeText }}
+                  </p>
+                </td>
+                <td class="px-6 py-4">
+                  {{ if .IsRevealed }}
+                  <span
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                    🔓 Terbuka
+                  </span>
+                  {{ else }}
+                  <span
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">
+                    🔒 Tertutup
+                  </span>
+                  {{ end }}
+                </td>
+                <td class="px-6 py-4">
+                  {{ if .IsActive }}
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                    Aktif
+                  </span>
+                  {{ else }}
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800">
+                    Non-aktif
+                  </span>
+                  {{ end }}
+                </td>
+                <td class="px-6 py-4 text-right space-x-2">
+                  <button
+                    onclick="openEditModal({{ .ID }}, {{ .CardNumber }}, '{{ .Suit }}', '{{ .ChallengeText }}', {{ .IsActive }})"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors">
+                    Edit
+                  </button>
+                  <form action="/admin/cards/{{ .ID }}/delete" method="POST" class="inline"
+                    onsubmit="return confirm('Hapus kartu #{{ .CardNumber }}?')">
+                    <button type="submit"
+                      class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors">
+                      Hapus
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {{ else }}
+              <tr>
+                <td colspan="7" class="px-6 py-12 text-center text-slate-400">
+                  Belum ada kartu di database.
+                </td>
+              </tr>
+              {{ end }}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Modal Tambah Kartu -->
+    <div id="createModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="text-xl font-extrabold text-slate-900">Tambah Kartu Baru</h3>
+          <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+        </div>
+
+        <form action="/admin/cards" method="POST" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor Urut Kartu</label>
+            <input type="number" name="card_number" value="{{ .NextNumber }}" required min="1" max="100"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:outline-none text-sm font-semibold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Motif / Lambang Kartu</label>
+            <select name="suit"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:outline-none text-sm font-semibold">
+              <option value="hearts">♥ Hearts (Hati Merah)</option>
+              <option value="spades">♠ Spades (Sekop Hitam)</option>
+              <option value="diamonds">♦ Diamonds (Wajik Merah)</option>
+              <option value="clubs">♣ Clubs (Keriting Hitam)</option>
+              <option value="star">★ Star (Bintang Emas)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Isi Kalimat Tantangan</label>
+            <textarea name="challenge_text" rows="4" required
+              placeholder="Contoh: Sebutkan 3 nama hewan yang hidup di kutub!"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:outline-none text-sm leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="create_is_active" name="is_active" value="1" checked
+              class="w-4 h-4 rounded text-rose-600 focus:ring-rose-500">
+            <label for="create_is_active" class="text-sm font-bold text-slate-700">Kartu Aktif (Ditampilkan di papan
+              permainan)</label>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-3">
+            <button type="button" onclick="closeCreateModal()"
+              class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100">Batal</button>
+            <button type="submit"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold bg-rose-600 text-white hover:bg-rose-700 shadow-md shadow-rose-600/20">Simpan
+              Kartu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Edit Kartu -->
+    <div id="editModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="text-xl font-extrabold text-slate-900">Edit Kartu Tantangan</h3>
+          <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+        </div>
+
+        <form id="editForm" method="POST" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor Urut Kartu</label>
+            <input type="number" id="edit_card_number" name="card_number" required min="1" max="100"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-semibold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Motif / Lambang Kartu</label>
+            <select id="edit_suit" name="suit"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-semibold">
+              <option value="hearts">♥ Hearts (Hati Merah)</option>
+              <option value="spades">♠ Spades (Sekop Hitam)</option>
+              <option value="diamonds">♦ Diamonds (Wajik Merah)</option>
+              <option value="clubs">♣ Clubs (Keriting Hitam)</option>
+              <option value="star">★ Star (Bintang Emas)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Isi Kalimat Tantangan</label>
+            <textarea id="edit_challenge_text" name="challenge_text" rows="4" required
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="edit_is_active" name="is_active" value="1"
+              class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500">
+            <label for="edit_is_active" class="text-sm font-bold text-slate-700">Kartu Aktif</label>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-3">
+            <button type="button" onclick="closeEditModal()"
+              class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100">Batal</button>
+            <button type="submit"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-600/20">Perbarui
+              Kartu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Batch Import Kartu -->
+    <div id="batchModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <span>📥</span> Batch Import Kartu Tantangan
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Tambahkan 20–30 kartu sekaligus tanpa perlu input satu per satu.
+            </p>
+          </div>
+          <button onclick="closeBatchModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+        </div>
+
+        <!-- Action Toolbar Template -->
+        <div class="flex flex-wrap items-center gap-2 mb-4 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+          <a href="/admin/template/csv"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 hover:text-indigo-600 border border-slate-200 shadow-xs transition-colors">
+            <span>⬇️ Unduh File CSV Excel</span>
+          </a>
+          <button type="button" onclick="fillSimpleTemplate()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 hover:text-indigo-600 border border-slate-200 shadow-xs transition-colors">
+            <span>✨ Contoh 1 Baris / Kalimat</span>
+          </button>
+          <button type="button" onclick="fillCsvTemplate()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 hover:text-indigo-600 border border-slate-200 shadow-xs transition-colors">
+            <span>📋 Contoh Format CSV</span>
+          </button>
+        </div>
+
+        <form action="/admin/cards/batch" method="POST" class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-xs font-bold text-slate-700 uppercase">
+                Tempel / Ketik Data Kartu:
+              </label>
+              <span class="text-[11px] text-slate-400">Format: 1 baris per tantangan atau CSV (Nomor,Suit,Teks)</span>
+            </div>
+            <textarea id="batch_raw_data" name="raw_data" rows="8" required
+              placeholder="Ketik atau tempel kalimat tantangan di sini...&#10;Contoh format 1 kalimat per baris:&#10;Sebutkan 3 hal yang paling kamu syukuri hari ini!&#10;Peragakan gerakan hewan favoritmu selama 10 detik!&#10;&#10;Atau format CSV:&#10;1,spades,Sebutkan 3 hal yang kamu syukuri!&#10;2,hearts,Peragakan gerakan hewan!"
+              class="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs sm:text-sm font-mono leading-relaxed"></textarea>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+            <input type="checkbox" id="batch_replace_all" name="replace_all" value="1"
+              class="mt-0.5 w-4 h-4 rounded text-rose-600 focus:ring-rose-500">
+            <label for="batch_replace_all" class="text-xs font-bold text-amber-900 leading-snug cursor-pointer">
+              Ganti seluruh kartu yang ada saat ini (Kosongkan kartu lama & gantikan dengan daftar baru ini).
+              <span class="block font-normal text-amber-700 text-[11px] mt-0.5">Biarkan tidak dicentang jika Anda hanya
+                ingin menambahkan (append) kartu baru.</span>
+            </label>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-2">
+            <button type="button" onclick="closeBatchModal()"
+              class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100">Batal</button>
+            <button type="submit"
+              class="px-6 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/20 active:scale-95">Import
+              & Simpan Sekarang</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function openCreateModal() {
+        document.getElementById('createModal').classList.remove('hidden');
+        document.getElementById('createModal').classList.add('flex');
+      }
+      function closeCreateModal() {
+        document.getElementById('createModal').classList.add('hidden');
+        document.getElementById('createModal').classList.remove('flex');
+      }
+
+      function openBatchModal() {
+        document.getElementById('batchModal').classList.remove('hidden');
+        document.getElementById('batchModal').classList.add('flex');
+      }
+      function closeBatchModal() {
+        document.getElementById('batchModal').classList.add('hidden');
+        document.getElementById('batchModal').classList.remove('flex');
+      }
+
+      function fillSimpleTemplate() {
+        const sample = `Sebutkan 3 hal yang paling kamu syukuri hari ini dengan senyum lebar!
+Peragakan gerakan hewan favoritmu selama 10 detik tanpa suara, biar teman menebak!
+Bacakan satu pantun jenaka buatanmu sendiri untuk teman di sebelah kananmu!
+Sebutkan nama 5 ibukota negara di dunia dalam waktu 15 detik!
+Berikan pujian tulus dan tepuk tangan meriah untuk teman yang duduk paling belakang!
+Ceritakan cita-citamu di masa depan dalam 3 kalimat penuh semangat!
+Tirukan gaya seorang pembaca berita TV sedang menyampaikan kabar gembira!
+Sebutkan 5 kata dalam bahasa Inggris yang diawali huruf 'S' beserta artinya!
+Lakukan pose pahlawan super (superhero) terbaikmu dan tahan selama 5 detik!
+Ucapkan kalimat ini 3 kali dengan cepat: 'Ular melingkar-lingkar di atas pagar bundar'!`;
+        document.getElementById('batch_raw_data').value = sample;
+      }
+
+      function fillCsvTemplate() {
+        const sample = `card_number,suit,challenge_text
+1,spades,Sebutkan 3 hal yang paling kamu syukuri hari ini dengan senyum lebar!
+2,hearts,Peragakan gerakan hewan favoritmu selama 10 detik tanpa mengeluarkan suara!
+3,diamonds,Bacakan satu pantun jenaka buatanmu sendiri untuk teman di sebelah kananmu!
+4,clubs,Sebutkan nama 5 ibukota negara di dunia dalam waktu 15 detik!
+5,star,Berikan pujian tulus dan tepuk tangan meriah untuk teman yang duduk paling belakang!`;
+        document.getElementById('batch_raw_data').value = sample;
+      }
+
+      function openEditModal(id, number, suit, text, isActive) {
+        document.getElementById('editForm').action = '/admin/cards/' + id;
+        document.getElementById('edit_card_number').value = number;
+        document.getElementById('edit_suit').value = suit;
+        document.getElementById('edit_challenge_text').value = text;
+        document.getElementById('edit_is_active').checked = isActive;
+        document.getElementById('editModal').classList.remove('hidden');
+        document.getElementById('editModal').classList.add('flex');
+      }
+      function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+        document.getElementById('editModal').classList.remove('flex');
+      }
+
+      // Logika Seleksi & Bulk Delete
+      function toggleSelectAll(master) {
+        const checkboxes = document.querySelectorAll('.card-checkbox');
+        checkboxes.forEach(cb => cb.checked = master.checked);
+        updateSelection();
+      }
+
+      function updateSelection() {
+        const checkboxes = document.querySelectorAll('.card-checkbox:checked');
+        const count = checkboxes.length;
+        const countSpan = document.getElementById('selectedCount');
+        const btn = document.getElementById('bulkDeleteBtn');
+
+        if (countSpan) countSpan.textContent = count;
+
+        if (count > 0) {
+          btn.disabled = false;
+          btn.classList.remove('bg-rose-100', 'text-rose-300', 'cursor-not-allowed');
+          btn.classList.add('bg-rose-600', 'text-white', 'hover:bg-rose-700', 'shadow-md', 'shadow-rose-600/20', 'cursor-pointer');
+        } else {
+          btn.disabled = true;
+          btn.classList.remove('bg-rose-600', 'text-white', 'hover:bg-rose-700', 'shadow-md', 'shadow-rose-600/20', 'cursor-pointer');
+          btn.classList.add('bg-rose-100', 'text-rose-300', 'cursor-not-allowed');
+        }
+
+        const allCheckboxes = document.querySelectorAll('.card-checkbox');
+        const master = document.getElementById('selectAllCheckbox');
+        if (master && allCheckboxes.length > 0) {
+          master.checked = count === allCheckboxes.length;
+        }
+      }
+
+      function submitBulkDelete() {
+        const checkboxes = document.querySelectorAll('.card-checkbox:checked');
+        if (checkboxes.length === 0) return;
+
+        const count = checkboxes.length;
+        if (!confirm(`Hapus ${count} kartu yang dipilih secara permanen?`)) return;
+
+        const ids = Array.from(checkboxes).map(cb => cb.value);
+        document.getElementById('bulkDeleteIds').value = ids.join(',');
+        document.getElementById('bulkDeleteForm').submit();
+      }
+
+      // Tampilkan notifikasi flash jika ada query param
+      const params = new URLSearchParams(window.location.search);
+      const msg = params.get('msg');
+      if (msg) {
+        const alertBox = document.getElementById('flashAlert');
+        const alertText = document.getElementById('flashText');
+        if (msg === 'created') alertText.textContent = 'Kartu baru berhasil ditambahkan!';
+        if (msg === 'updated') alertText.textContent = 'Kartu berhasil diperbarui!';
+        if (msg === 'deleted') alertText.textContent = 'Kartu berhasil dihapus!';
+        if (msg === 'seeded') alertText.textContent = 'Daftar kartu berhasil direset ke 25 tantangan default!';
+        if (msg === 'batch_success') {
+          const count = params.get('count') || '';
+          alertText.textContent = `Berhasil mengimpor ${count} kartu sekaligus!`;
+        }
+        if (msg === 'bulk_deleted') {
+          const count = params.get('count') || '';
+          alertText.textContent = `Berhasil menghapus ${count} kartu yang dipilih!`;
+        }
+        if (msg === 'all_deleted') alertText.textContent = 'Seluruh kartu berhasil dikosongkan dari database!';
+        if (msg === 'no_selection') alertText.textContent = 'Pilih minimal 1 kartu untuk dihapus.';
+
+        alertBox.classList.remove('hidden');
+        setTimeout(() => alertBox.classList.add('hidden'), 4000);
+      }
+    </script>
+  </body>
+
+</html>
