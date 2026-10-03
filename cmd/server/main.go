@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"mime"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -95,14 +96,34 @@ func main() {
 	mux.HandleFunc("POST /admin/cards/delete-all", auth.MiddlewareAuth(adminH.DeleteAll))
 
 	adminUser, _ := auth.GetCredentials()
-	addr := fmt.Sprintf(":%s", port)
+	localIP := getLocalIP()
+	addr := fmt.Sprintf("0.0.0.0:%s", port)
 	log.Printf("==================================================")
-	log.Printf("🃏 Card Reveal Challenge berjalan di http://localhost:%s", port)
-	log.Printf("🔐 Admin Login: http://localhost:%s/login", port)
-	log.Printf("👤 Default Admin Username: %s (Password: admin123)", adminUser)
+	log.Printf("🃏 Akses di Laptop ini   : http://localhost:%s", port)
+	log.Printf("📱 Akses di HP / Teman   : http://%s:%s", localIP, port)
+	log.Printf("🔐 Admin Login           : http://localhost:%s/login", port)
+	log.Printf("👤 Default Kredensial    : %s (Password: admin123)", adminUser)
 	log.Printf("==================================================")
 
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatalf("Server berhenti dengan error: %v", err)
 	}
+}
+
+func getLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "127.0.0.1"
+	}
+	for _, address := range addrs {
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				ipStr := ipnet.IP.String()
+				if !strings.HasPrefix(ipStr, "169.254.") {
+					return ipStr
+				}
+			}
+		}
+	}
+	return "127.0.0.1"
 }
