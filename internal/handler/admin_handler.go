@@ -281,11 +281,11 @@ func (h *AdminHandler) DownloadTemplateCSV(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Disposition", "attachment; filename=template_kartu_tantangan.csv")
 
 	csvContent := `card_number,suit,challenge_text
-1,spades,Sebutkan 3 hal yang paling kamu syukuri hari ini dengan senyum lebar!
-2,hearts,Peragakan gerakan hewan favoritmu selama 10 detik tanpa mengeluarkan suara!
-3,diamonds,Bacakan satu pantun jenaka buatanmu sendiri untuk teman di sebelah kananmu!
-4,clubs,Sebutkan nama 5 ibukota negara di dunia dalam waktu 15 detik!
-5,star,Berikan pujian tulus dan tepuk tangan meriah untuk teman yang duduk paling belakang!
+1,spades,Salaman dengan si paling susah di-chat di grup
+2,diamonds,Salaman dengan si paling jago ngeles
+3,clubs,Salaman dengan si paling receh
+4,hearts,Salaman dengan si paling sering ketiduran
+5,star,Salaman dengan si paling random isi kepalanya
 `
 	w.Write([]byte(csvContent))
 }
