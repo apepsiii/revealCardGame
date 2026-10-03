@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,7 +11,21 @@ import (
 	"revealCard/internal/database"
 	"revealCard/internal/handler"
 	"revealCard/internal/repository"
+	"revealCard/web"
+	"strings"
 )
+
+func init() {
+	// Pastikan MIME types terdaftar secara eksplisit agar browser tidak menolak stylesheet/javascript
+	_ = mime.AddExtensionType(".css", "text/css; charset=utf-8")
+	_ = mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
+	_ = mime.AddExtensionType(".json", "application/json; charset=utf-8")
+	_ = mime.AddExtensionType(".svg", "image/svg+xml")
+	_ = mime.AddExtensionType(".png", "image/png")
+	_ = mime.AddExtensionType(".jpg", "image/jpeg")
+	_ = mime.AddExtensionType(".jpeg", "image/jpeg")
+	_ = mime.AddExtensionType(".ico", "image/x-icon")
+}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -28,12 +42,8 @@ func main() {
 	defer db.Close()
 	log.Printf("✓ Database SQLite terhubung di: %s", dbPath)
 
-	// 2. Parsing Template HTML
-	tmpl, err := template.ParseFiles(
-		filepath.Join("web", "templates", "game.html"),
-		filepath.Join("web", "templates", "login.html"),
-		filepath.Join("web", "templates", "admin", "index.html"),
-	)
+	// 2. Parsing Template HTML (Mendukung Disk Lokal & Embedded Binary)
+	tmpl, err := web.LoadTemplates()
 	if err != nil {
 		log.Fatalf("Gagal membaca template HTML: %v", err)
 	}
@@ -48,10 +58,19 @@ func main() {
 	// 4. Setup Router HTTP (Go 1.22+ Standard Mux)
 	mux := http.NewServeMux()
 
-	// File Statis (CSS, JS, Aset)
-	staticDir := filepath.Join("web", "static")
-	fileServer := http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir)))
-	mux.Handle("GET /static/", fileServer)
+	// 5. File Statis (CSS, JS, Aset) dengan Fallback Embedded FS & Jaminan Header MIME
+	staticFS := web.GetStaticFS()
+	fileServer := http.StripPrefix("/static/", http.FileServer(staticFS))
+
+	mux.HandleFunc("GET /static/", func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		if strings.HasSuffix(path, ".css") {
+			w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		} else if strings.HasSuffix(path, ".js") {
+			w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+		}
+		fileServer.ServeHTTP(w, r)
+	})
 
 	// Rute Permainan Siswa (Terbuka untuk kelas)
 	mux.HandleFunc("GET /{$}", gameH.Index)
